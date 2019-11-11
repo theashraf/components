@@ -1896,7 +1896,22 @@ class TonicBadge extends Tonic { /* global Tonic */
 
 Tonic.add(TonicBadge)
 
+/**
+ * Implement Form Element
+ *
+ * https://html.spec.whatwg.org/multipage/custom-elements.html#custom-elements-face-example
+ */
 class TonicButton extends Tonic { /* global Tonic */
+  static get formAssociated() { return true; }
+
+  constructor (o) {
+    super(o)
+    this._internals = this.attachInternals();
+  }
+
+  get form() { return this._internals.form; }
+  get name() { return this.getAttribute('name'); }
+
   get value () {
     return this.props.value
   }
@@ -2485,6 +2500,16 @@ class TonicIcon extends Tonic { /* global Tonic */
 Tonic.add(TonicIcon)
 
 class TonicInput extends Tonic { /* global Tonic */
+  static get formAssociated() { return true; }
+
+  constructor (o) {
+    super(o)
+    this._internals = this.attachInternals();
+  }
+
+  get form() { return this._internals.form; }
+  get name() { return this.getAttribute('name'); }
+
   defaults () {
     return {
       type: 'text',
@@ -2675,7 +2700,7 @@ class TonicInput extends Tonic { /* global Tonic */
       relay('blur')
     })
 
-    input.addEventListener('keyup', e => {
+    input.addEventListener('input', e => {
       set('value', e.target.value)
       set('pos', e.target.selectionStart)
       relay('input')
@@ -2686,11 +2711,14 @@ class TonicInput extends Tonic { /* global Tonic */
 
     input.focus()
 
+    const oldType = input.type
+    input.type = 'text'
     try {
       input.setSelectionRange(state.pos, state.pos)
     } catch (err) {
       console.warn(err)
     }
+    input.type = oldType
   }
 
   updated () {
@@ -2708,6 +2736,7 @@ class TonicInput extends Tonic { /* global Tonic */
   }
 
   connected () {
+    this.type = 'text'
     this.updated()
   }
 
@@ -2773,7 +2802,8 @@ class TonicInput extends Tonic { /* global Tonic */
     const spellcheckAttr = spellcheck ? `spellcheck="${spellcheck}"` : ''
     const tabAttr = tabindex ? `tabindex="${tabindex}"` : ''
     const titleAttr = title ? `title="${title}"` : ''
-    const value = this.state.value || this.props.value
+    const value = typeof this.state.value === 'string' ?
+      this.state.value : this.props.value
     const valueAttr = value && value !== 'undefined' ? `value="${value.replace(/"/g, '&quot;')}"` : ''
 
     if (ariaLabelledByAttr) this.removeAttribute('ariaLabelled')
