@@ -1,4 +1,14 @@
 class TonicInput extends Tonic { /* global Tonic */
+  static get formAssociated() { return true; }
+
+  constructor (o) {
+    super(o)
+    this._internals = this.attachInternals();
+  }
+
+  get form() { return this._internals.form; }
+  get name() { return this.getAttribute('name'); }
+
   defaults () {
     return {
       type: 'text',

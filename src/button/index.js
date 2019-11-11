@@ -1,4 +1,19 @@
+/**
+ * Implement Form Element
+ *
+ * https://html.spec.whatwg.org/multipage/custom-elements.html#custom-elements-face-example
+ */
 class TonicButton extends Tonic { /* global Tonic */
+  static get formAssociated() { return true; }
+
+  constructor (o) {
+    super(o)
+    this._internals = this.attachInternals();
+  }
+
+  get form() { return this._internals.form; }
+  get name() { return this.getAttribute('name'); }
+
   get value () {
     return this.props.value
   }
