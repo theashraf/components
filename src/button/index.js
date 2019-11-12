@@ -136,24 +136,46 @@ class TonicButton extends Tonic { /* global Tonic */
     if (button) button.classList[method]('tonic--loading')
   }
 
-  click (e) {
-    const disabled = this.props.disabled === 'true'
-    const async = this.props.async === 'true'
-    const href = this.props.href
+  /**
+   * A Custom element that is "formAssociated" has it's
+   * events broken with tonic ... For some reason adding
+   * events from tonic and implementing the `click()` method
+   * does not work.
+   *
+   * Manaully adding `connected` & `updated` and query selecting
+   * the correct element ( in this case `button` ) and attaching
+   * an event listener on that element does work however.
+   */
+  setupEvents() {
+    const button = this.querySelector('button')
 
-    if (async && !disabled) {
-      this.loading(true)
-    }
+    button.addEventListener('click', () => {
+      const disabled = this.props.disabled === 'true'
+      const async = this.props.async === 'true'
+      const href = this.props.href
 
-    if (href) {
-      const target = this.getAttribute('target')
-
-      if (target && target !== '_self') {
-        window.open(href)
-      } else {
-        window.open(href, '_self')
+      if (async && !disabled) {
+        this.loading(true)
       }
-    }
+
+      if (href) {
+        const target = this.getAttribute('target')
+
+        if (target && target !== '_self') {
+          window.open(href)
+        } else {
+          window.open(href, '_self')
+        }
+      }
+    })
+  }
+
+  updated () {
+    this.setupEvents()
+  }
+
+  connected () {
+    this.updated()
   }
 
   styles () {
